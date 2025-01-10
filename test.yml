@@ -1,6 +1,6 @@
 - name: Run command on remote devices
 
- tasks:
+- tasks:
 
     - name: system command
 
