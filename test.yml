@@ -1,4 +1,3 @@
 - name: Run command on remote devices
   community.routeros.command:
     commands: /system routerboard print
-ignore_errors: yes
