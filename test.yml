@@ -1,6 +1,5 @@
 ---
 - name: Manage RouterOS
-  hosts: routeros_devices
   gather_facts: no
   collections:
     - community.routeros
