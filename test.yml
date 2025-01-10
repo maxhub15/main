@@ -1,7 +1,5 @@
 ---
 - name: Manage RouterOS
-  ansible_host: 10.0.105.68
-  gather_facts: no
   collections:
     - community.routeros
   tasks:
