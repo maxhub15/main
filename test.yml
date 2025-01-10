@@ -1,6 +1,11 @@
-collections:
+---
+- name: Manage RouterOS
+  hosts: routeros_devices
+  gather_facts: no
+  collections:
     - community.routeros
-tasks:
-    - name: Run command on remote devices
-  community.routeros.command:
-    commands: /system routerboard print
+  tasks:
+    - name: Execute a command on RouterOS
+      community.routeros.command:
+        commands:
+          - /system identity print
