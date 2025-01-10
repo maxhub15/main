@@ -2,5 +2,5 @@ collections:
     - community.routeros
 tasks:
     - name: Run command on remote devices
-  community.routeros.api:
+  community.routeros.command:
     commands: /system routerboard print
