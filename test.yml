@@ -1,5 +1,4 @@
 - name: Run command on remote devices
-hosts: all
   community.routeros.command:
     commands: /system routerboard print
 ignore_errors: yes
