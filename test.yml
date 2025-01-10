@@ -1,5 +1,6 @@
 ---
 - name: Manage RouterOS
+  hosts: routers
   gather_facts: no
   collections:
     - community.routeros
