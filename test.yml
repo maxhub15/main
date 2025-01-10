@@ -8,7 +8,7 @@
 
     - name: system command
 
-      routeros_command:
+      community.routeros:
 
         commands: /system routerboard print
 
