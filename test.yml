@@ -1,15 +1,3 @@
-- hosts: all
-  collections:
-    - community.routeros
-
 - name: Run command on remote devices
-
-- tasks:
-
-    - name: system command
-
-      community.routeros.command:
-
-        commands: /system routerboard print
-
-      register: system_print
+  community.routeros.command:
+    commands: /system routerboard print
