@@ -1,6 +1,6 @@
 ---
 - name: Manage RouterOS
-  hosts: 10.0.105.68
+  hosts: 192.168.124.1
   gather_facts: no
   collections:
     - community.routeros
