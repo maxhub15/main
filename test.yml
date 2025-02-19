@@ -1,6 +1,8 @@
 ---
 - name: Manage RouterOS
   hosts: 192.168.124.1
+  vars:
+  ansible_remote_tmp: /tmp/
   gather_facts: no
   collections:
     - community.routeros
