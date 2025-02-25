@@ -2,7 +2,7 @@
 - name: Manage RouterOS
   hosts: 192.168.124.1
   vars:
-    ansible_remote_tmp: "/home/"
+    ansible_remote_tmp: "/tmp/"
   gather_facts: no
   collections:
     - community.routeros
@@ -10,4 +10,4 @@
     - name: Execute a command on RouterOS
       community.routeros.command:
         commands:
-          - /system identity print
+          - /system identity set name=Test
