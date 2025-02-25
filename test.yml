@@ -2,6 +2,8 @@
 - name: Manage RouterOS
   hosts: 192.168.124.1
   vars:
+    ansible_user: admin
+    ansible_connection: network_cli
     ansible_network_os: community.routeros.routeros
   gather_facts: no
   collections:
