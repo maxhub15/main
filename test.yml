@@ -2,7 +2,8 @@
 - name: Manage RouterOS
   hosts: 192.168.124.1
   vars:
-    ansible_user: admin
+    ansible_user: vvrn-sa-service2
+    ansible_password: "4uhrFNiHSEzs25tQ$5zGq"
     ansible_connection: network_cli
     ansible_network_os: community.routeros.routeros
   gather_facts: no
@@ -13,5 +14,3 @@
       community.routeros.command:
         commands:
           - /system identity set name=Test
-          username: vvrn-sa-service2
-          password: 4uhrFNiHSEzs25tQ$5zGq
