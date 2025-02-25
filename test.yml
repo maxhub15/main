@@ -13,3 +13,5 @@
       community.routeros.command:
         commands:
           - /system identity set name=Test
+          username: vvrn-sa-service2
+          password: 4uhrFNiHSEzs25tQ$5zGq
