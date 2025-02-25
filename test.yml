@@ -3,7 +3,6 @@
   hosts: 192.168.124.1
   vars:
     ansible_network_os: community.routeros.routeros
-    ansible_remote_tmp: "/tmp/"
   gather_facts: no
   collections:
     - community.routeros
@@ -12,8 +11,3 @@
       community.routeros.command:
         commands:
           - /system identity set name=Test
-register: result
-
-- name: Display the result of the command
-      debug:
-        msg: "{{ result.stdout }}"
