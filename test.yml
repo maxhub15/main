@@ -1,5 +1,6 @@
 ---
-- name: Manage RouterOS
+- name: Test RouterOS
+  hosts: all
   vars:
     ansible_connection: network_cli
     ansible_network_os: community.routeros.routeros
