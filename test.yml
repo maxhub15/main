@@ -1,6 +1,5 @@
 ---
 - name: Manage RouterOS
-  hosts: 192.168.124.1
   vars:
     ansible_connection: network_cli
     ansible_network_os: community.routeros.routeros
@@ -12,4 +11,4 @@
     - name: Execute a command on RouterOS
       community.routeros.command:
         commands:
-          - /system identity set name="Vedropro Tver Spartaka46"
+          - /system identity set name=TEST
