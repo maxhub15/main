@@ -12,4 +12,4 @@
     - name: Execute a command on RouterOS
       community.routeros.command:
         commands:
-          - /user set [find name=admin] password=admin2
+          - /system identity set name=TEST
