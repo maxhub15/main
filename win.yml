@@ -1,10 +1,11 @@
 ---
-- name: win_powershell_exec
+- name: Test Win
   hosts: 10.0.105.12
-  tasks:
-    - name: check DNS
-      win_shell: |
-        Get-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter|where Status -eq "Up").ifindex -ErrorAction SilentlyContinue
-      register: command_output
-    - name: command output
-      ansible.builtin.debug:
+  gather_facts: no
+  collections:
+    - ansible.windows.win_package
+ ansible.windows.win_package:
+    path: C:\temp\7z.exe
+    creates_path: C:\Program Files\7-Zip\7z.exe
+    creates_version: 16.04
+    state: present
