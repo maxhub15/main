@@ -1,11 +1,16 @@
-
 ---
-- name: Test Win
+- name: Install default apps 
   hosts: 10.0.105.12
-  gather_facts: no
-  collections:
-    - ansible.windows.win_package
- ansible.windows.win_package:
-    product_id: 7-Zip
-    arguments: /S
-    state: absent
+  gather_facts: false
+  tasks: 
+#Upgrade all instaled packages  
+  - name: Upgrade installed packages
+    win_chocolatey:
+      name: all
+      state: latest
+
+      #install 7zip from Internet
+  - name: Download the 7-Zip package
+      win_get_url:
+        url: https://www.7-zip.org/a/7z1701-x64.msi
+        dest: C:\temp\7z.msi
