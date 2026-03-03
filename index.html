@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Фруктовый Арканойд 🍎🍐🍌</title>
+    <style>
+        body { margin:0; background:#111; display:flex; flex-direction:column; align-items:center; font-family:sans-serif; }
+        canvas { background:#8f8; touch-action:none; }
+        button { margin:10px; padding:15px 30px; font-size:20px; border:none; border-radius:12px; background:#ff0; color:#000; }
+    </style>
+</head>
+<body>
+    <canvas id="c" width="400" height="620"></canvas>
+    
+    <!-- Кнопка поделиться для Telegram -->
+    <button onclick="shareScore()" style="display:none;" id="shareBtn">Поделиться счётом 🍌</button>
+
+    <script src="https://telegram.org/js/games.js"></script>
+    <script>
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        const W = 400, H = 620;
+        
+        // === ПЕРЕМЕННЫЕ ИГРЫ ===
+        let paddleX = W/2 - 50, paddleY = H - 50, paddleW = 100, paddleH = 28;
+        let ballX, ballY, ballR = 14, dx = 0, dy = 0;
+        let attached = true;
+        let score = 0, lives = 3;
+        let gameOver = false, won = false;
+        
+        // Кирпичи-бананы
+        const brickW = 48, brickH = 22, brickPadding = 6, brickOffsetTop = 70, brickOffsetLeft = 14;
+        const rowCount = 6, colCount = 7;
+        let bricks = [];
+        
+        // Джойстик (горизонтальный)
+        const joyBaseX = 75, joyBaseY = H - 85, joyR = 45;
+        let knobX = joyBaseX, knobY = joyBaseY;
+        let joyActive = false;
+        
+        // Кнопка стрельбы
+        const shootX = W - 75, shootY = H - 85, shootR = 38;
+        
+        // Клавиатура (для теста на ПК)
+        let leftKey = false, rightKey = false;
+        
+        function initBricks() {
+            bricks = [];
+            for (let r = 0; r < rowCount; r++) {
+                for (let c = 0; c < colCount; c++) {
+                    bricks.push({
+                        x: brickOffsetLeft + c * (brickW + brickPadding),
+                        y: brickOffsetTop + r * (brickH + brickPadding),
+                        status: 1
+                    });
+                }
+            }
+        }
+        
+        function resetBall() {
+            attached = true;
+            dx = 0; dy = 0;
+        }
+        
+        function shoot() {
+            if (attached && !gameOver && !won) {
+                attached = false;
+                dy = -7.5;
+                dx = (Math.random() * 3 - 1.5); // лёгкий разброс
+            }
+        }
+        
+        function resetGame() {
+            score = 0; lives = 3; gameOver = false; won = false;
+            paddleX = W/2 - 50;
+            initBricks();
+            resetBall();
+        }
+        
+        function shareScore() {
+            if (window.TelegramGameProxy) {
+                TelegramGameProxy.shareScore();
+            } else {
+                alert(`Твой счёт: ${score} 🍌\nСкопируй и отправь друзьям!`);
+            }
+        }
+        
+        // === РИСОВАНИЕ ===
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            
+            // Фон
+            ctx.fillStyle = '#aaffaa';
+            ctx.fillRect(0, 0, W, H);
+            
+            // Бананы-кирпичи
+            ctx.font = '26px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            for (let b of bricks) {
+                if (b.status === 1) {
+                    ctx.fillStyle = '#ffdd00';
+                    ctx.fillRect(b.x, b.y, brickW, brickH);
+                    ctx.fillStyle = '#000';
+                    ctx.fillText('🍌', b.x + brickW/2, b.y + brickH/2 + 2);
+                }
+            }
+            
+            // Яблоко-платформа
+            ctx.fillStyle = '#ff4444';
+            ctx.fillRect(paddleX, paddleY, paddleW, paddleH);
+            ctx.font = '42px Arial';
+            ctx.fillStyle = '#000';
+            ctx.fillText('🍎', paddleX + paddleW/2, paddleY + paddleH/2 + 4);
+            
+            // Груша-мячик
+            ctx.font = '32px Arial';
+            ctx.fillStyle = '#000';
+            ctx.fillText('🍐', ballX, ballY + 6);
+            
+            // Джойстик
+            ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.arc(joyBaseX, joyBaseY, joyR, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.fillStyle = joyActive ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.arc(knobX, knobY, 18, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Кнопка стрельбы
+            ctx.fillStyle = '#44ff44';
+            ctx.beginPath();
+            ctx.arc(shootX, shootY, shootR, 0, Math.PI*2);
+            ctx.fill();
+            ctx.font = '36px Arial';
+            ctx.fillStyle = '#000';
+            ctx.fillText('🍐', shootX, shootY + 6);
+            
+            // UI
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#000';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Счёт: ${score}`, 15, 35);
+            ctx.fillText(`Жизни: ${'🍎'.repeat(lives)}`, 15, 60);
+            
+            if (won) {
+                ctx.font = '40px Arial';
+                ctx.fillStyle = '#0a0';
+                ctx.textAlign = 'center';
+                ctx.fillText('ПОБЕДА! 🎉', W/2, H/2 - 40);
+                ctx.font = '24px Arial';
+                ctx.fillText(`Счёт: ${score}`, W/2, H/2 + 10);
+                document.getElementById('shareBtn').style.display = 'block';
+            }
+            if (gameOver) {
+                ctx.font = '40px Arial';
+                ctx.fillStyle = '#f00';
+                ctx.textAlign = 'center';
+                ctx.fillText('ИГРА ОКОНЧЕНА', W/2, H/2 - 40);
+                ctx.fillText(`Счёт: ${score}`, W/2, H/2 + 10);
+                document.getElementById('shareBtn').style.display = 'block';
+            }
+        }
+        
+        // === ЛОГИКА ===
+        function update() {
+            if (gameOver || won) return;
+            
+            // Движение платформы от джойстика
+            if (joyActive) {
+                const delta = knobX - joyBaseX;
+                paddleX += (delta / joyR) * 9; // скорость
+            } else if (leftKey) paddleX -= 8;
+            else if (rightKey) paddleX += 8;
+            
+            paddleX = Math.max(0, Math.min(W - paddleW, paddleX));
+            
+            // Прикреплённый мячик
+            if (attached) {
+                ballX = paddleX + paddleW / 2;
+                ballY = paddleY - ballR - 6;
+            } else {
+                ballX += dx;
+                ballY += dy;
+                
+                // Стены
+                if (ballX - ballR < 0 || ballX + ballR > W) dx = -dx;
+                if (ballY - ballR < 0) dy = -dy;
+                
+                // Пол (потеря жизни)
+                if (ballY - ballR > H) {
+                    lives--;
+                    if (lives <= 0) gameOver = true;
+                    else resetBall();
+                }
+                
+                // Столкновение с платформой
+                if (ballY + ballR > paddleY && ballY - ballR < paddleY + paddleH &&
+                    ballX > paddleX && ballX < paddleX + paddleW) {
+                    dy = -Math.abs(dy) - 0.3; // немного ускоряем
+                    const hitPos = (ballX - (paddleX + paddleW/2)) / (paddleW/2);
+                    dx = hitPos * 5.5;
+                }
+                
+                // Столкновение с бананами
+                for (let i = 0; i < bricks.length; i++) {
+                    let b = bricks[i];
+                    if (b.status === 1 &&
+                        ballX + ballR > b.x && ballX - ballR < b.x + brickW &&
+                        ballY + ballR > b.y && ballY - ballR < b.y + brickH) {
+                        
+                        b.status = 0;
+                        score += 10;
+                        dy = -dy;
+                        
+                        // Проверка победы
+                        if (bricks.every(br => br.status === 0)) won = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        
+        // === УПРАВЛЕНИЕ ===
+        function getPos(t) {
+            const rect = canvas.getBoundingClientRect();
+            return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+        }
+        
+        function updateKnob(tx, ty) {
+            let dx = tx - joyBaseX;
+            dx = Math.max(-joyR, Math.min(joyR, dx));
+            knobX = joyBaseX + dx;
+            knobY = joyBaseY; // только горизонталь
+        }
+        
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            for (let t of e.changedTouches) {
+                const p = getPos(t);
+                
+                // Джойстик
+                const jDist = Math.hypot(p.x - joyBaseX, p.y - joyBaseY);
+                if (jDist < joyR + 30) {
+                    joyActive = true;
+                    updateKnob(p.x, p.y);
+                }
+                
+                // Кнопка стрельбы
+                const sDist = Math.hypot(p.x - shootX, p.y - shootY);
+                if (sDist < shootR + 20) shoot();
+                
+                // Перезапуск после конца игры
+                if ((gameOver || won) && p.y > 100) resetGame();
+            }
+        });
+        
+        canvas.addEventListener('touchmove', e => {
+            e.preventDefault();
+            for (let t of e.changedTouches) {
+                if (joyActive) {
+                    const p = getPos(t);
+                    updateKnob(p.x, p.y);
+                }
+            }
+        });
+        
+        canvas.addEventListener('touchend', e => {
+            joyActive = false;
+            knobX = joyBaseX;
+            knobY = joyBaseY;
+        });
+        
+        // Клавиатура (ПК)
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft') leftKey = true;
+            if (e.key === 'ArrowRight') rightKey = true;
+            if (e.key === ' ' || e.key === 'Spacebar') shoot();
+        });
+        document.addEventListener('keyup', e => {
+            if (e.key === 'ArrowLeft') leftKey = false;
+            if (e.key === 'ArrowRight') rightKey = false;
+        });
+        
+        // Запуск
+        initBricks();
+        resetBall();
+        loop();
+    </script>
+</body>
+</html>
